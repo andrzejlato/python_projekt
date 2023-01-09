@@ -113,7 +113,7 @@ def main():
     # Generate testset
     #test = [get_corrupted_input(d, 0.48) for d in data] #0.3, 0.5, 0.4, 0.45, 0.48
     #test = [get_corrupted_input_cover(d, 0.02, 68) for d in data] #60, 65 ,68, 70
-    test = [get_corrupted_input_line(d, 0.3) for d in data]
+    test = [get_corrupted_input_line(d, 0.425) for d in data]
     predicted = model.predict(test, threshold=0, asyn=False)
     print("Show prediction results...")
     plot(data, test, predicted)
