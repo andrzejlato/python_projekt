@@ -14,6 +14,8 @@ from skimage.filters import threshold_mean
 from skimage.transform import resize
 import network
 from skimage import io as io
+import random
+
 
 # Utils
 def get_corrupted_input(input, corruption_level):
@@ -22,6 +24,31 @@ def get_corrupted_input(input, corruption_level):
     for i, v in enumerate(input):
         if inv[i]:
             corrupted[i] = -1 * v
+    return corrupted
+
+
+def get_corrupted_input_line(input, corruption_level):
+    corrupted = np.copy(input)
+    inv = np.random.binomial(n=1, p=corruption_level, size=128)
+    x = 127
+    for i in range(0, x):
+        if inv[i]:
+            for n in range(0, x):
+                corrupted[i*(x+1) + n] = -1
+    return corrupted
+
+
+def get_corrupted_input_cover(input, corruption_level, noise_size):
+    corrupted = np.copy(input)
+    inv = np.random.binomial(n=1, p=corruption_level, size=128)
+    x = 128
+    for i in range(0, x - 1):
+        if inv[i]:
+            k = noise_size
+            l = random.randint(0, x - k - 1)
+            for n in range(i, i + k - 1):
+                for m in range(l, l + k - 1):
+                        corrupted[(x - 1)*m + n + i] = -1
     return corrupted
 
 def reshape(data):
@@ -84,8 +111,9 @@ def main():
     model.train_weights(data)
 
     # Generate testset
-    test = [get_corrupted_input(d, 0.3) for d in data]
-
+    #test = [get_corrupted_input(d, 0.48) for d in data] #0.3, 0.5, 0.4, 0.45, 0.48
+    #test = [get_corrupted_input_cover(d, 0.02, 68) for d in data] #60, 65 ,68, 70
+    test = [get_corrupted_input_line(d, 0.3) for d in data]
     predicted = model.predict(test, threshold=0, asyn=False)
     print("Show prediction results...")
     plot(data, test, predicted)
